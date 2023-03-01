@@ -268,7 +268,7 @@ SkBenchmark >> generateMutants [
 		            with: AllTestsMethodsRunningMutantEvaluationStrategy new.
 
 	mutants := (analysis generateMutations mutations groupedBy:
-		            #originalMethod) collect: [ :e | e first ]
+		            #originalMethod) collect: [ :e | e atRandom ]
 ]
 
 { #category : #instrumentation }
