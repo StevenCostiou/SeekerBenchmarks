@@ -71,11 +71,11 @@ SkBenchmark >> benchBruteForceReversal [
 	testClasses := self testMethodsAndClasses.
 	privateCounter := 0.
 
-	(testClasses flattened copyFrom: 123 to: testClasses flattened size) do: [ :testMethod |
+	testClasses flattened do: [ :testMethod |
 		output := self outputFileStream writeStream.
 		output << self outputFileStream readStream contents.
 		output cr.
-		
+
 		test := testMethod methodClass new.
 		test timeLimit: 50 years.
 		test setTestSelector: testMethod selector.
@@ -88,13 +88,13 @@ SkBenchmark >> benchBruteForceReversal [
 			tracer step ].
 		testStartingBytecode := tracer executedBytecode.
 		tracer stepToEnd.
-		
+
 		privateCounter := privateCounter + 1.
 
 		bytecodes := self
 			             bytecodesToTimeTravelFrom: testStartingBytecode
 			             to: tracer executedBytecode.
-			
+
 		bytecodes do: [ :i |
 			tracer timeTravelToBytecodeIndex: i.
 			tracer stepToEnd.
