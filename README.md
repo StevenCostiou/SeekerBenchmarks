@@ -14,7 +14,10 @@ SkBenchmark new benchBruteForceReversal.
 SkBenchmark new testMethodsAndClasses flattened.
 
 ```
-
-
+The following test methods must be removed because they use reflective code of the kernel and Seekr is unable (yet) to handle time-travel on executions manipulating objects from there (such as meta classes):
+```Smalltalk 
+STONReaderTest>>testClassWithUnderscore.
+STONWriterTest>>testSpecialClassNames.
+```
 
 TODO: bench with mutants
