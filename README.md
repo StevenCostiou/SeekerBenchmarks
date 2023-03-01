@@ -9,6 +9,12 @@ SkBenchmark new benchForORUR.
 
 "Bench for ensuring time-traveling troughout executions produce the same results"
 SkBenchmark new benchBruteForceReversal.
+
+"Get the test methods"
+SkBenchmark new testMethodsAndClasses flattened.
+
 ```
+
+
 
 TODO: bench with mutants
