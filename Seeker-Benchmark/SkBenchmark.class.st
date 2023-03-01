@@ -114,10 +114,59 @@ SkBenchmark >> benchBruteForceReversal [
 ]
 
 { #category : #benchmarking }
+SkBenchmark >> benchBruteForceReversalForMutants [
+
+	| output testClasses test tcu tracer privateCounter testStartingBytecode endContext bytecodes |
+	testClasses := self testMethodsAndClasses.
+	privateCounter := 0.
+
+	(testClasses flattened copyFrom: 1 to: 53) do: [ :testMethod |
+		output := self outputFileStream writeStream.
+		output << self outputFileStream readStream contents.
+		output cr.
+
+		test := testMethod methodClass new.
+		test timeLimit: 50 years.
+		test setTestSelector: testMethod selector.
+		test setUp.
+
+		tcu := SeekerDebugger headlessDebugBlock: [ test runCase ].
+		tracer := tcu tracer.
+
+		[ tracer currentContext selector = #performTest ] whileFalse: [
+			tracer step ].
+		testStartingBytecode := tracer executedBytecode.
+		tracer stepToEnd.
+
+		privateCounter := privateCounter + 1.
+
+		bytecodes := self
+			             bytecodesToTimeTravelFrom: testStartingBytecode
+			             to: tracer executedBytecode.
+
+		bytecodes do: [ :i |
+			tracer timeTravelToBytecodeIndex: i.
+			tracer stepToEnd.
+			endContext := tcu tracer currentContext.
+
+			output << privateCounter printString.
+			output << $;.
+			output << testMethod printString.
+			output << $;.
+			output << 'bytecode'.
+			output space.
+			output << i printString.
+			output << $;.
+			output << endContext receiver printString.
+			output cr ].
+		output close ]
+]
+
+{ #category : #benchmarking }
 SkBenchmark >> benchBruteForceReversalWithMutants [
 	self generateMutants.
 	mutants do: #install.
-	self benchBruteForceReversal.
+	self benchBruteForceReversalForMutants.
 	mutants do: #uninstall
 ]
 
@@ -300,7 +349,7 @@ SkBenchmark >> nextBytecodeToTimeTravelFrom: start to: max by: step [
 	^ start + step min: max
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'as\"yet\"unclassified' }
 SkBenchmark >> outputFileStream [
 
 	^ 'bmark' asFileReference
