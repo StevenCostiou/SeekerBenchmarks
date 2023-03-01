@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'testResults',
-		'executedTests'
+		'executedTests',
+		'mutants'
 	],
 	#classVars : [
 		'Counter'
@@ -110,6 +111,14 @@ SkBenchmark >> benchBruteForceReversal [
 			output << endContext method method name.
 			output cr ].
 		output close ]
+]
+
+{ #category : #benchmarking }
+SkBenchmark >> benchBruteForceReversalWithMutants [
+	self generateMutants.
+	mutants do: #install.
+	self benchBruteForceReversal.
+	mutants do: #uninstall
 ]
 
 { #category : #benchmarking }
@@ -245,6 +254,21 @@ SkBenchmark >> bytecodesToTimeTravelFrom: start to: max [
 		lastBytecode := lastBytecode + step.
 		bytecodes add: lastBytecode ].
 	^ bytecodes
+]
+
+{ #category : #instrumentation }
+SkBenchmark >> generateMutants [
+
+	| classesToMutate analysis |
+	classesToMutate := 'STON-Core' asPackage definedClasses.
+	analysis := MutationTestingAnalysis
+		            testCasesFrom: {  }
+		            mutating: classesToMutate
+		            using: MutantOperator contents
+		            with: AllTestsMethodsRunningMutantEvaluationStrategy new.
+
+	mutants := (analysis generateMutations mutations groupedBy:
+		            #originalMethod) collect: [ :e | e first ]
 ]
 
 { #category : #instrumentation }
