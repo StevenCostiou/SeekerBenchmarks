@@ -1,3 +1,6 @@
+The following instructions detail how to install and run the benchmarks.
+WARNING: PLEASE NOTE THAT PART OF THESE INSTRUCTIONS (AT THE END) MIGHT CONTAIN INFORMATION BREAKING ANONYMITY.
+
 # SeekerBenchmarks
 
 Every benchmark writes its results in a csv file named *bench* in the image directory.
@@ -12,6 +15,9 @@ SkBenchmark new benchForORUR.
 "Bench for ensuring time-traveling troughout executions produce the same results"
 SkBenchmark new benchBruteForceReversal.
 
+"Bench with mutants introducing mutations"
+SkBenchmark new benchBruteForceReversalWithMutants.
+
 "Get the test methods"
 SkBenchmark new testMethodsAndClasses flattened.
 ```
@@ -21,5 +27,10 @@ The following test methods must be removed because they use reflective code of t
 STONReaderTest>>testClassWithUnderscore.
 STONWriterTest>>testSpecialClassNames.
 ```
+## Reproducing the benchmark's results
 
-TODO: bench with mutants
+1 - Download and run Pharo 11 https://pharo.org/
+2 - Install Seeker https://github.com/maxwills/SeekerDebugger
+3 - Install the mutation framework https://github.com/pharo-contributions/mutalk/
+4 - Install the benchmarks https://github.com/StevenCostiou/SeekerBenchmarks
+5 - Run the code above
