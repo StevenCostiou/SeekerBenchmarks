@@ -163,6 +163,116 @@ SkBenchmark >> benchBruteForceReversalForMutants [
 ]
 
 { #category : #benchmarking }
+SkBenchmark >> benchBruteForceReversalMethodRevert [
+
+	| output testClasses test tcu tracer privateCounter testStartingBytecode bytecodes result |
+	testClasses := self testMethodsAndClasses.
+	privateCounter := 0.
+
+	(testClasses flattened withIndexSelect: [ :e :i |
+		 (#( testToString testSTON testEmpty testError testDictionaryWithIndirectReferenceKeys testIllegalCharacterEscapes testWideSymbol ) includes: e selector) not ]) do: [ :testMethod |
+		output := self outputFileStream writeStream.
+		output setToEnd.
+		output
+			cr;
+			cr.
+
+		test := testMethod methodClass new.
+		test timeLimit: 50 years.
+		test setTestSelector: testMethod selector.
+		test setUp.
+
+		tcu := SeekerDebugger headlessDebugBlock: [ test runCase ].
+		tracer := tcu tracer.
+
+		[ tracer currentContext selector = #performTest ] whileFalse: [
+			tracer step ].
+		testStartingBytecode := tracer executedBytecode.
+		tracer stepToEnd.
+
+		privateCounter := privateCounter + 1.
+
+		"Execute once with seeker to get the bytecodes to step to and the contexts"
+		bytecodes := self
+			             bytecodesToTimeTravelFrom: testStartingBytecode
+			             to: tracer executedBytecode.
+
+		bytecodes do: [ :i |
+			| targetToComplete sentinelProcess processToRestart |
+			Stdio stdout nextPutAll: test asString; nextPutAll: ' '; nextPutAll: i asString; crlf.
+			
+			Stdio stdout nextPutAll: 'Seeker is travelling...'; crlf.
+			tcu := SeekerDebugger headlessDebugBlock: [ test runCase ].
+			tracer := tcu tracer.
+			tracer timeTravelToBytecodeIndex: i.
+			
+			Stdio stdout nextPutAll: 'Seeker traveled'; crlf.
+			"Get a copy of the stack at the point of time travel"
+			sentinelProcess := Process
+				                   forContext:
+				                   tracer debuggedProcess suspendedContext
+					                   copyStack
+				                   priority: 41.
+			processToRestart := Process
+				                    forContext:
+				                    tracer debuggedProcess suspendedContext
+					                    copyStack
+				                    priority: 41.
+
+			Stdio stdout nextPutAll: 'Sentinel is travelling ...'; crlf.
+			[ "Run sentinel until #runCase or error to make it change state"
+			targetToComplete := sentinelProcess suspendedContext bottomContext.
+			[ targetToComplete selector ~= #runCase ] whileTrue: [
+				targetToComplete := sentinelProcess calleeOf: targetToComplete ].
+			Processor activeProcess
+				evaluate: [
+					sentinelProcess suspendedContext runUntilErrorOrReturnFrom:
+						targetToComplete ]
+				onBehalfOf: sentinelProcess.
+
+			Stdio stdout nextPutAll: 'Sentinel arrived.'; crlf; nextPutAll: 'Voyager is travelling ...'; crlf.
+			"Restart process that will be witness of the previous side effects, and execute it until the end"
+			processToRestart restartTop.
+			targetToComplete := processToRestart suspendedContext bottomContext.
+			[ targetToComplete selector ~= #runCase ] whileTrue: [
+				targetToComplete := processToRestart calleeOf: targetToComplete ].
+			result := Processor activeProcess
+				          evaluate: [
+					          processToRestart suspendedContext
+						          runUntilErrorOrReturnFrom: targetToComplete ]
+				          onBehalfOf: processToRestart.
+
+			Stdio stdout nextPutAll: 'Voyager arrived.'; crlf.
+			
+			output << privateCounter printString.
+			output << $;.
+			output << testMethod printString.
+			output << $;.
+			output << 'bytecode'.
+			output space.
+			output << i printString.
+			output << $;.
+			output << processToRestart suspendedContext method method name.
+			output << $;.
+			output << result printString.
+			output flush ]
+				on: Error
+				do: [ :error |
+					output << privateCounter printString.
+					output << $;.
+					output << testMethod printString.
+					output << $;.
+					output << 'bytecode'.
+					output space.
+					output << i printString.
+					output << $;.
+					output << 'BENCHMARK ERROR: '.
+					output << error asString.
+					output flush ] ].
+		output close ]
+]
+
+{ #category : #benchmarking }
 SkBenchmark >> benchBruteForceReversalWithMutants [
 	self generateMutants.
 	mutants do: #install.
@@ -349,7 +459,7 @@ SkBenchmark >> nextBytecodeToTimeTravelFrom: start to: max by: step [
 	^ start + step min: max
 ]
 
-{ #category : #'as\"yet\"unclassified' }
+{ #category : #'as"yet"unclassified' }
 SkBenchmark >> outputFileStream [
 
 	^ 'bmark' asFileReference
