@@ -15,17 +15,19 @@ BaselineOfSeekerBenchmarks >> baseline: spec [
 
 { #category : #actions }
 BaselineOfSeekerBenchmarks >> preload: loader package: packageSpec [
+	"Install SeekerDebugger"
+	Metacello new
+		baseline: 'Seeker';
+		repository: 'github://maxwills/SeekerDebugger:main';
+		load.
+		
 	"Install test mutation framework"
 
 	Metacello new
 		baseline: 'MuTalk';
 		repository: 'github://pharo-contributions/mutalk/src';
 		load.
-	"Install SeekerDebugger"
-	Metacello new
-		baseline: 'Seeker';
-		repository: 'github://maxwills/SeekerDebugger:main';
-		load.
+	
 	"remove problematic tests"
 	[ (STONReaderTest >> #testClassWithUnderscore) removeFromSystem ]
 		onErrorDo: [ :e |
