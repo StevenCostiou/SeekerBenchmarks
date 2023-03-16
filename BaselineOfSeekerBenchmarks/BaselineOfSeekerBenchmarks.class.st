@@ -4,6 +4,15 @@ Class {
 	#category : #BaselineOfSeekerBenchmarks
 }
 
+{ #category : #baselines }
+BaselineOfSeekerBenchmarks >> baseline: spec [
+
+	<baseline>
+	spec for: #common do: [
+		spec preLoadDoIt: #'preload:package:'.
+		spec package: 'Seeker-Benchmark' ]
+]
+
 { #category : #actions }
 BaselineOfSeekerBenchmarks >> preload: loader package: packageSpec [
 	"Install test mutation framework"
