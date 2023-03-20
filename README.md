@@ -42,11 +42,10 @@ STONWriterTest>>testSpecialClassNames.
 ```
 ## Reproducing the benchmark's results
 
-1 - Download and run Pharo 11 https://pharo.org/
-2 - Install the set up baseline. 
-    The baseline will automatically:
-    2.a - Install Seeker https://github.com/maxwills/SeekerDebugger
-    2.b - Install the mutation framework https://github.com/pharo-contributions/mutalk/
-    2.c - Install the benchmarks https://github.com/StevenCostiou/SeekerBenchmarks
-    2.d - Remove the problematic tests
-3 - Run the code above
+1. Download and run Pharo 11 https://pharo.org/
+2. Install the set up baseline. The baseline will automatically:  
+   a. Install Seeker https://github.com/maxwills/SeekerDebugger  
+   b. Install the mutation framework https://github.com/pharo-contributions/mutalk/  
+   c. Install the benchmarks https://github.com/StevenCostiou/SeekerBenchmarks  
+   d. Remove the problematic tests  
+3. Run the code above
