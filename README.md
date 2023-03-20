@@ -11,7 +11,8 @@ Metacello new
     repository: 'github://StevenCostiou/SeekerBenchmarks:main';
     load.
 ```
-This code install the time-traveling debugger and the mutation framework used for the benchmarks.
+This code installs the time-traveling debugger and the mutation framework used for the benchmarks.
+It also removes the problematics tests, as stated in the detailes below.
 
 ## SeekerBenchmarks
 
@@ -42,7 +43,10 @@ STONWriterTest>>testSpecialClassNames.
 ## Reproducing the benchmark's results
 
 1 - Download and run Pharo 11 https://pharo.org/
-2 - Install Seeker https://github.com/maxwills/SeekerDebugger
-3 - Install the mutation framework https://github.com/pharo-contributions/mutalk/
-4 - Install the benchmarks https://github.com/StevenCostiou/SeekerBenchmarks
-5 - Run the code above
+2 - Install the set up baseline. 
+    The baseline will automatically:
+    2.a - Install Seeker https://github.com/maxwills/SeekerDebugger
+    2.b - Install the mutation framework https://github.com/pharo-contributions/mutalk/
+    2.c - Install the benchmarks https://github.com/StevenCostiou/SeekerBenchmarks
+    2.d - Remove the problematic tests
+3 - Run the code above
