@@ -1,7 +1,19 @@
 The following instructions detail how to install and run the benchmarks.
-WARNING: PLEASE NOTE THAT PART OF THESE INSTRUCTIONS (AT THE END) MIGHT CONTAIN INFORMATION BREAKING ANONYMITY.
+WARNING: PLEASE NOTE THAT PART OF THESE INSTRUCTIONS MIGHT CONTAIN INFORMATION BREAKING ANONYMITY.
 
-# SeekerBenchmarks
+## Set up the image
+
+Execute the following in a new Pharo 11 64bit image.
+
+```Smalltalk 
+Metacello new
+    baseline: 'SeekerBenchmarks';
+    repository: 'github://StevenCostiou/SeekerBenchmarks:main';
+    load.
+```
+This code install the time-traveling debugger and the mutation framework used for the benchmarks.
+
+## SeekerBenchmarks
 
 Every benchmark writes its results in a csv file named *bench* in the image directory.
 Each run appends to the previous file, so be careful to remove the old file before generating new results.
