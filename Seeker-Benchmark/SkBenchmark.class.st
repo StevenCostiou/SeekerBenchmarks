@@ -470,10 +470,14 @@ SkBenchmark >> outputFileStream [
 { #category : #instrumentation }
 SkBenchmark >> testMethodsAndClasses [
 
-	^ self testPackages flatCollect: [ :p |
-		  (p classes collect: [
-			   :c | c -> (c methods select: [ :m | m isTestMethod ]) ])
-			  asDictionary ]
+	| classesAndMethods |
+	classesAndMethods := Dictionary new.
+	((self testPackages flatCollect: [ :p |
+		  (p classes collect: [ :c |
+			   c -> (c methods select: [ :m | m isTestMethod ]) ]) asDictionary ])
+		 select: [ :a | a isNotEmpty ]) do: [ :a |
+		classesAndMethods at: a first methodClass put: a ].
+	^ classesAndMethods
 ]
 
 { #category : #instrumentation }
