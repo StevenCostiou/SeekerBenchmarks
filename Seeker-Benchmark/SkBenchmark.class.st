@@ -114,6 +114,60 @@ SkBenchmark >> benchBruteForceReversal [
 ]
 
 { #category : #benchmarking }
+SkBenchmark >> benchBruteForceReversal: bundleIndex [
+
+	| output testClasses test tcu tracer privateCounter testStartingBytecode endContext bytecodes fromTo |
+	fromTo := {  { 1. 60 }.
+		          { 61. 77 }.
+		          { 78. 114 }.{ 115. 120 }.
+		          { 121. self testMethodsAndClasses size } } at: bundleIndex.
+	testClasses := self testMethodsAndClasses.
+	privateCounter := 0.
+
+	(testClasses flattened copyFrom: fromTo first to: fromTo second) do: [
+		:testMethod |
+		output := self outputFileStream writeStream.
+		output << self outputFileStream readStream contents.
+		output cr.
+
+		test := testMethod methodClass new.
+		test timeLimit: 50 years.
+		test setTestSelector: testMethod selector.
+		test setUp.
+
+		tcu := SeekerDebugger headlessDebugBlock: [ test runCase ].
+		tracer := tcu tracer.
+
+		[ tracer currentContext selector = #performTest ] whileFalse: [
+			tracer step ].
+		testStartingBytecode := tracer executedBytecode.
+		tracer stepToEnd.
+
+		privateCounter := privateCounter + 1.
+
+		bytecodes := self
+			             bytecodesToTimeTravelFrom: testStartingBytecode
+			             to: tracer executedBytecode.
+
+		bytecodes do: [ :i |
+			tracer timeTravelToBytecodeIndex: i.
+			tracer stepToEnd.
+			endContext := tcu tracer currentContext.
+
+			output << privateCounter printString.
+			output << $;.
+			output << testMethod printString.
+			output << $;.
+			output << 'bytecode'.
+			output space.
+			output << i printString.
+			output << $;.
+			output << endContext method method name.
+			output cr ].
+		output close ]
+]
+
+{ #category : #benchmarking }
 SkBenchmark >> benchBruteForceReversalForMutants [
 
 	| output testClasses test tcu tracer privateCounter testStartingBytecode endContext bytecodes |
