@@ -22,20 +22,30 @@ When a test is successfully ran, the last logged entry is the benchark method na
 If the test under time-travel fails for any reason, an exception is logged instead.
 
 ```Smalltalk 
+"The benchmark is time-consuming. The following might take around 20 minutes to complete"
 "Bench to check for UR and OR effects"
 SkBenchmark new benchForORUR.
 
 "Bench for ensuring time-traveling troughout executions produce the same results"
-SkBenchmark new benchBruteForceReversal.
+"This benchmark takes more time. It has been divided in bundles, so the user can execute smaller amounts of tests"
+"To generate all the results, execute all these calls:"
+SkBenchmark new benchBruteForceReversal:1.
+SkBenchmark new benchBruteForceReversal:2.
+SkBenchmark new benchBruteForceReversal:3.
+SkBenchmark new benchBruteForceReversal:4.
+SkBenchmark new benchBruteForceReversal:5.
 
 "Bench with mutants introducing mutations"
+"this is the fastest benchmark and it is finished in around 10 mins"
 SkBenchmark new benchBruteForceReversalWithMutants.
+
+The generated data is written to the file 'bmark' in the same image folder.
 
 "Get the test methods"
 SkBenchmark new testMethodsAndClasses flattened.
 ```
 
-The following test methods must be removed because they use reflective code of the kernel and Seekr is unable (yet) to handle time-travel on executions manipulating objects from there (such as meta classes):
+The following test methods must be removed because they use reflective code of the kernel and Seeker is unable (yet) to handle time-travel on executions manipulating objects from there (such as meta classes):
 ```Smalltalk 
 STONReaderTest>>testClassWithUnderscore.
 STONWriterTest>>testSpecialClassNames.
